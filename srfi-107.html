@@ -47,6 +47,7 @@ subscribe to the list.  You can access previous messages via
       <li>Draft: 2012/11/10-2013/01/10</li>
       <li>Revision: <a href="http://srfi.schemers.org/cgi-bin/viewcvs.cgi/*checkout*/srfi/srfi-107/srfi-107.html?rev=1.2">2013/02/04</a></li>
       <li>Revision: <a href="http://srfi.schemers.org/cgi-bin/viewcvs.cgi/*checkout*/srfi/srfi-107/srfi-107.html?rev=1.3">2013/11/03</a></li>
+      <li>Revision: <a href="http://srfi.schemers.org/cgi-bin/viewcvs.cgi/*checkout*/srfi/srfi-107/srfi-107.html?rev=1.4">2013/12/09</a></li>
 </ul>
 
 <H1>Abstract</H1>
@@ -142,7 +143,7 @@ A document element is just an XML element
 node that is the top-level element in a document.
 A document node is a special kind of node whose primary child
 is the document element, but may have other children (comments and
-process-instructions) and properties such as a public identifier.
+processing instructions) and DTD properties such as a public identifier.
 This specification provides a syntax for creating XML elements,
 but does not provide a mechanism for representing
 whole XML documents (i.e. document nodes and their properties).
@@ -184,7 +185,7 @@ and/or:
 <h2>Syntax</h2>
 
 <p>An <var class="replaceable"><code>xml-literal</code></var> is usually an element constructor.
-We'll cover later the less common processing-instruction,
+We'll cover later the less common processing instruction,
 comment, and CDATA-section forms.
 </p>
 <pre>
@@ -275,18 +276,18 @@ The result is implementation-defined if a symbol's name contains a colon.
 </pre>
 
 <p>The first <var class="replaceable"><code>xml-element-constructor</code></var> variant uses a literal <var class="replaceable"><code>QName</code></var>,
-and looks like standard non-empty XML element, where the starting <var class="replaceable"><code>QName</code></var>
+and looks like a standard non-empty XML element, where the starting <var class="replaceable"><code>QName</code></var>
 and the ending <var class="replaceable"><code>QName</code></var> must match exactly:
 </p>
 <pre class="screen">#&lt;a href="next.html"&gt;Next&lt;/a&gt;
 </pre>
-<p>As a convenience, you can leave out the ending tag(s):
+<p>As a convenience, you can leave out the name in end-tag:
 </p>
 <pre class="screen">&lt;para&gt;This is a paragraph in &lt;emphasis&gt;DocBook&lt;/&gt; syntax.&lt;/&gt;
 </pre>
 
-<p>You can use an expression to compute the element tag at runtime -
-in that case you <em>must</em> leave out the ending tag:
+<p>You can use an expression to compute the name in the start-tag at runtime -
+in that case you <em>must</em> leave out the name in the end-tag:
 </p>
 <pre class="screen">#&lt;p&gt;This is &lt;[(if be-bold 'strong 'em)]&gt;important&lt;/&gt;!&lt;/p&gt;
 </pre>
@@ -303,8 +304,6 @@ is a valid <var class="replaceable"><code>xml-element-constructor</code></var>, 
 are a sequence of character (text) data,
 nested nodes, and enclosed (unquoted) expressions.
 The latter are discussed later.
-The characters <code class="literal">&amp;</code>, <code class="literal">&lt;</code>, and <code class="literal">&gt;</code> are special,
-and need to be escaped.
 </p>
 <pre>
 <var class="non-terminal-def">xml-element-datum</var> ::=
@@ -312,6 +311,19 @@ and need to be escaped.
   | <var class="non-terminal">xml-constructor</var>
   | <var class="non-terminal">xml-escaped</var>
 </pre>
+<p>The characters <code class="literal">&amp;</code> and
+<code class="literal">&lt;</code> are special and need to be escaped.
+<p>
+The character <code class="literal">&gt;</code> does not have to
+be escaped, but it is good style to always do so, as it makes it
+easier to visually distinguish it from markup.
+(The <a href="http://www.w3.org/community/microxml/">MicroXML</a> 
+proposal does not even allow unquoted <code class="literal">&gt;</code>.)
+The XML and HTML 4.x standards do not allow
+the literal text <code class="literal">]]&gt;</code> in element content,
+for historical reasons of SGML-compatibility.
+For this reason an implementation of this specification <em>may</em>
+warn if literal <code class="literal">]]&gt;</code> is seen. 
 <p>
 A nested <var class="non-terminal">xml-constructor</var>
 is functionally equivalent to an <var class="non-terminal">xml-literal</var>
@@ -323,7 +335,7 @@ For example:
 </pre>
 is equivalent to:
 <pre>
-#&lt;p&gt;This is &amp;{#&lt;em&gt;important&lt;/em&gt;}!&lt;/p&gt;
+#&lt;p&gt;This is &amp;[#&lt;em&gt;important&lt;/em&gt;]!&lt;/p&gt;
 </pre>
 <pre>
 <var class="non-terminal-def">xml-escaped</var> ::=
@@ -399,7 +411,7 @@ sections of <a href="../srfi-109/srfi-109.html">SRFI-109</a>.
 <h3>Attributes</h3>
 <p>
 An attribute associates an attribute name with an attribute value.
-This is done using a <var class="non-terminal">xml-true-attribute</var> form,
+This is done using an <var class="non-terminal">xml-true-attribute</var> form,
 which is an <var class="non-terminal">xml-attribute</var>
 that does <em>not</em> have the form of
 <var class="non-terminal">xml-namespace-declaration-attribute</var>.
@@ -452,7 +464,7 @@ the namespace-uri specified by <var class="replaceable"><code>xml-attribute-valu
 (which should be a compile-time constant, though an implementation
 <em>may</em> allow a general string-valued expression).
 The second declares that <var class="replaceable"><code>xml-attribute-value</code></var> is the default
-namespace for simple (unprefixed) element tags.
+namespace for unprefixed element names.
 (A default namespace declaration is ignored for attribute names.)
 </p>
 
@@ -462,7 +474,7 @@ namespace for simple (unprefixed) element tags.
 instructions or annotations to an XML processor or tool.</p>
 <pre>
 <var class="non-terminal-def">xml-PI-constructor</var> ::= <code class="literal">&lt;?</code> <var class="non-terminal">xml-PI-target</var> <var class="non-terminal">xml-PI-content</var> <code class="literal">?&gt;</code>
-<var class="non-terminal-def">xml-PI-target</var> ::= <var class="nn-terminal">NCname</var>
+<var class="non-terminal-def">xml-PI-target</var> ::= <var class="non-terminal">NCName</var>
 <var class="non-terminal=def">xml-PI-content</var> ::= any characters, not containing <code class="literal">?&gt;</code>.
 </pre>
 <p>For example, the DocBook XSLT stylesheets can use the <code class="literal">dbhtml</code>
@@ -525,7 +537,7 @@ The <code>()</code> in the result is the translation
 of any namespace declaration attributes - in this case none.
 Here is an example with namespace declarations:
 <pre>
-&lt;prefix2:a
+#&lt;prefix2:a
    xmlns:prefix1="URI1"
    xmlns:prefix2="URI&foo;2"
    xmlns="DURI"&gt;...&lt;/prefix2:a&gt;
@@ -640,15 +652,15 @@ default element namespace prefix (indicated by <code>$default-element-namespace$
    &#x27fe; <var class="non-terminal">expression</var>
 </pre>
 <p>The special node constructors are translated similarly:
-(<b>Note</b> This is simplified, since these forms should not handle
+(<b>Note:</b> This is simplified, since these forms should not handle
 escape characters the way element and attribute content does.)
 <pre>
 <b>Tr[</b><code class="literal">&lt;![CDATA[</code><var class="non-terminal">xml-CDATA-content</var><code class="literal">]]&gt;</code><b>]</b>
    &#x27fe; <code class="literal">($xml-CDATA$</code> <code class="literal">"</code><var class="non-terminal">xml-CDATA-content</var><code class="literal">")</code>
 <b>Tr[</b><code class="literal">&lt;--</code><var class="non-terminal">xml-comment-content</var><code class="literal">--&gt;</code><b>]</b>
    &#x27fe; <code class="literal">($xml-comment$</code> <code class="literal">"</code><var class="non-terminal">xml-comment-content</var><code class="literal">")</code>
-<b>Tr[</b><code class="literal">&lt;?</code><var class="non-terminal">xml-PI-target</var> <var class="non-terminal">xml-PI-content</var><code class="literal">?&gt;</code><b>]</b>
-   &#x27fe; <code class="literal">($xml-processing-instruction$</code> <var class="non-terminal">xml-PI-target</var> <b>TrContent[</b><var class="non-terminal">xml-PI-content</var><b>]</b><code clas="literal">)</code>
+<b>Tr[</b><code class="literal">&lt;?</code> <var class="non-terminal">xml-PI-target</var> <var class="non-terminal">xml-PI-content</var> <code class="literal">?&gt;</code><b>]</b>
+   &#x27fe; <code class="literal">($xml-processing-instruction$ "</code> <var class="non-terminal">xml-PI-target</var> <code class="literal">"</code> <b>TrContent[</b><var class="non-terminal">xml-PI-content</var><b>]</b><code clas="literal">)</code>
 </pre>
 
 <h2 id="translated-forms">Semantics</h2>
@@ -706,7 +718,7 @@ Each <var class="non-terminal">attribute</var> is usually
 an <code>$xml-attribute$</code> form, but an implementation may support
 other expressions that evaluate to <q>attribute nodes</q>.
 Each <var class="non-terminal">content</var> is an expression
-that evaluates to to element content, handled as described in the
+that evaluates to element content, handled as described in the
 <a href="#enclosed-expression-handling">Handling of enclosed expressions</a> section.
 <pre>
 <code class="literal">($xml-attribute$</code> <var class="non-terminal">name</var> <var class="non-terminal">content</var><sup>*</sup> <code class="literal">)</code> 
@@ -732,9 +744,9 @@ missing it defaults <code class="literal">$default-element-namespace$</code>.
 <pre>
 <code class="literal">($xml-processing-instruction$</code> <var class="non-terminal">xml-PI-target</var> <var class="non-terminal">content</var><sup>*</sup> <code class="literal">)</code> 
 </pre>
-Creates comment, CDATA, or processing-instruction (PI) node.
-The <var class="non-terminal">xml-PI-target</var> should be a symbol
-(or a QName in the empty namespace).
+Creates a comment, CDATA, or processing instruction (PI) node.
+The <var class="non-terminal">xml-PI-target</var> should be a string
+that matches <code>NCName</code>.
 The <var class="non-terminal">content</var> arguments should be strings,
 which are concatenated.
 
@@ -805,7 +817,7 @@ to the text value.  For example:
 </pre>
 <p>
 It is undefined if in the XML-node the contents is stored as a
-sequence of 4 integers, or as the string <code>"230 599 98 763"</code>,
+sequence of four integers, or as the string <code>"230 599 98 763"</code>,
 as long as the result prints the same way.
 
 <h3>Output of XML nodes</h3>
@@ -816,16 +828,23 @@ since this provides input-output round-tripping.
 Specifically, calling <code>write</code> on an XML-node <em>should</em> write
 an <var class="non-terminal">xml-literal</var> (with an initial
 <code class="literal">#</code>).
-The <var class="non-terminal">xml-constructor</var> <em>should</em> be in
-standard XML syntax without using any of extensions in this specification,
-such as an unnamed end tag.
 Calling <code>display</code> on an XML-node <em>should</em> write
 an <var class="non-terminal">xml-constructor</var> (without an initial
-<code class="literal">#</code>).  Alternatively, if the output port
-is an extended port that can handle <q>rich text</q> then an
+<code class="literal">#</code>).
+The <var class="non-terminal">xml-constructor</var> <em>should</em> be in
+standard XML syntax without using any of extensions in this specification,
+such as an unnamed end-tag,
+or an unescaped <code class="literal">]]&gt;</code>.
+In fact, it is strongly recommended that if <code class="literal">&gt;</code>
+appears in element or attribute content
+it should be written as the escaped form <code class="literal">&amp;gt;</code>.
+In addition, control characters (in attribute content also including
+newline or tab) should be escaped using character references.
+<p>Alternatively, for <code>display</code> (not <code>write</code>), if the
+output port is an extended port that can handle <q>rich text</q> then an
 implementation <em>may</em> instead display a styled representation.
 For example if the XML-node is compatible with HTML, and the
-output port is inserting text into a browser, then the implementation
+output port is inserting text into a browser document, then the implementation
 may copy the DOM into the browser, perhaps resulting in styled text.
 
 <h1>Implementation</h1>
