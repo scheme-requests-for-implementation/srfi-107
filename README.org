@@ -1,7 +1,6 @@
-# SPDX-FileCopyrightText: 2013 Per Bothner <per@bothner.com>
-#
-# SPDX-License-Identifier: MIT
 
+# SPDX-FileCopyrightText: 2024 Arthur A. Gleckler
+# SPDX-License-Identifier: MIT
 * SRFI 107: XML reader syntax
 
 ** by Per Bothner
@@ -19,6 +18,5 @@ The full documentation for this SRFI can be found in the [[https://srfi.schemers
 If you'd like to participate in the discussion of this SRFI, or report issues with it, please [[https://srfi.schemers.org/srfi-107/][join the SRFI-107 mailing list]] and send your message there.
 
 Thank you.
-
 
 [[mailto:srfi-editors@srfi.schemers.org][The SRFI Editors]]

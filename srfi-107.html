@@ -1,11 +1,10 @@
+<!DOCTYPE HTML>
+<html>
 <!--
 SPDX-FileCopyrightText: 2013 Per Bothner <per@bothner.com>
 
 SPDX-License-Identifier: MIT
 -->
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
   <head>
     <title>SRFI 107: XML reader syntax</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -98,7 +97,7 @@ that provide multiple possible implementations.  For example:
 The context may be an HTTP server, and the effect of evaluating
 the <code>$xml-element$</code> form is to assemble the XML or HTML
 response to an HTTP request, perhaps by making
-<a href="http://en.wikipedia.org/wiki/Simple_API_for_XML">SAX-style<a> calls
+<a href="http://en.wikipedia.org/wiki/Simple_API_for_XML">SAX-style</a> calls
 to an implicit output port.
 <li>
 Alternatively, an <code>$xml-element$</code> form is a constructor
@@ -115,7 +114,7 @@ since they can contain enclosed expressions, which are <q>unquoted</q>:
 <pre >
 #&lt;em&gt;The total is &amp;[result].&lt;/em&gt;
 </pre>
-<p>Notice the use of <q><code>&amp</code></q>, which is used in XML
+<p>Notice the use of <q><code>&amp;</code></q>, which is used in XML
 for character and entity references, but we use it as a multi-purpose prefix
 character to avoid adding extra special characters that
 might need escaping.  The Scheme reader turns the above into:
@@ -352,7 +351,7 @@ is equivalent to:
 </pre>
 <p>Here is an example with both hex and decimal character references:
 </p>
-<pre class="screen">#&lt;p&gt;A&amp;#66;C&amp;#x44;E&lt;/p&gt;  &#x027F9  &lt;p&gt;ABCDE&lt;/p&gt;
+<pre class="screen">#&lt;p&gt;A&amp;#66;C&amp;#x44;E&lt;/p&gt;  &#x027F9;  &lt;p&gt;ABCDE&lt;/p&gt;
 </pre>
 <p>
 
@@ -443,7 +442,6 @@ It can also be an enclosed expression that evaluates to an attribute node value.
     any character except <code class="literal">'</code>, <code class="literal">&amp;</code>, or <code class="literal">&lt;</code>.
   | <var class="non-terminal">xml-escaped</var>
 </pre>
-</p>
 
 <h3 class="title">Namespace declarations</h3>
 
@@ -485,7 +483,6 @@ written to a named HTML file:
 ...
 &lt;/chapter&gt;
 </pre>
-</div>
 
 <h3 class="title">XML comments</h3>
 <p>You can cause XML comments to be emitted in the XML output document.
@@ -659,7 +656,7 @@ escape characters the way element and attribute content does.)
 <b>Tr[</b><code class="literal">&lt;--</code><var class="non-terminal">xml-comment-content</var><code class="literal">--&gt;</code><b>]</b>
    &#x27fe; <code class="literal">($xml-comment$</code> <code class="literal">"</code><var class="non-terminal">xml-comment-content</var><code class="literal">")</code>
 <b>Tr[</b><code class="literal">&lt;?</code> <var class="non-terminal">xml-PI-target</var> <var class="non-terminal">xml-PI-content</var> <code class="literal">?&gt;</code><b>]</b>
-   &#x27fe; <code class="literal">($xml-processing-instruction$ "</code> <var class="non-terminal">xml-PI-target</var> <code class="literal">"</code> <b>TrContent[</b><var class="non-terminal">xml-PI-content</var><b>]</b><code clas="literal">)</code>
+   &#x27fe; <code class="literal">($xml-processing-instruction$ "</code> <var class="non-terminal">xml-PI-target</var> <code class="literal">"</code> <b>TrContent[</b><var class="non-terminal">xml-PI-content</var><b>]</b><code class="literal">)</code>
 </pre>
 
 <h2 id="translated-forms">Semantics</h2>
@@ -711,7 +708,7 @@ or a <code>$resolve-qname$</code> form.
 <p>
 The binding for <code>$xml-element$</code> must be a macro, not a function,
 because each <var class="non-terminal">namespace-binding</var>
-adds a (prefix,URI)-binding in the lexical context.  That binding is used to evaluate QNames in the remaining parameters, which are all expressions, including the <var class="non-terminal">name<var>.
+adds a (prefix,URI)-binding in the lexical context.  That binding is used to evaluate QNames in the remaining parameters, which are all expressions, including the <var class="non-terminal">name</var>.
 <p>
 Each <var class="non-terminal">attribute</var> is usually
 an <code>$xml-attribute$</code> form, but an implementation may support
@@ -865,7 +862,7 @@ can be translated into something like:
 <pre>
 (let ()
   (define-namespace <var class="non-terminal">prefix</var> (string-append <var class="non-terminal">namespace-uri-part</var><sup>+</sup>))<sup>*</sup>
-  (make-element name</var> <var class="non-terminal">attribute</var><sup>*</sup> <var class="non-terminal">content</var><sup>*</sup>)
+  (make-element <var>name</var> <var class="non-terminal">attribute</var><sup>*</sup> <var class="non-terminal">content</var><sup>*</sup>)
 </pre>
 <p>
 The translation is more complicated if in-scope namespace bindings
@@ -941,7 +938,7 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
 <hr />
 <address>Author: <a href="mailto:per@bothner.com">Per Bothner</a></address>
-<address>Editor: <a href="mailto:srfi-editors at srfi dot schemers dot org">
+<address>Editor: <a href="mailto:srfi-editors+at+srfi+dot+schemers+dot+org">
              Mike Sperber</a></address>
 </body>
 </html>
