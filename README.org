@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2013 Per Bothner <per@bothner.com>
+#
+# SPDX-License-Identifier: MIT
+
 * SRFI 107: XML reader syntax
 
 ** by Per Bothner
